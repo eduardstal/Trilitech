@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: 'ipfs.io',
         pathname: '/ipfs/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        pathname: '/**',
+      },
       // Optionally, add more gateways if needed:
       // {
       //   protocol: 'https',

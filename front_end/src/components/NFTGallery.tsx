@@ -1,5 +1,10 @@
+// src/components/NFTGallery.tsx
 import React, { useEffect, useState } from "react";
 import Image from 'next/image';
+import TransferNFT from '../components/Transfer';
+
+// Static assets
+const PLACEHOLDER_IMAGE = '/placeholder.png';
 
 interface NFTMetadata {
   image?: string;
@@ -13,6 +18,29 @@ interface NFT {
   metadata?: NFTMetadata;
 }
 
+const NFTImage: React.FC<{
+  metadata?: NFTMetadata;
+  tokenId: string;
+}> = ({ metadata, tokenId }) => {
+  const [imgSrc, setImgSrc] = useState(
+    metadata?.image 
+      ? metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+      : PLACEHOLDER_IMAGE
+  );
+
+  return (
+    <Image
+      src={imgSrc}
+      alt={metadata?.name || `NFT ${tokenId}`}
+      fill
+      className="nft-image"
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      onError={() => setImgSrc(PLACEHOLDER_IMAGE)}
+      priority={false}
+    />
+  );
+};
+
 const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(false);
@@ -21,15 +49,18 @@ const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
     if (!account) return;
     
     setLoading(true);
-    const fetchURL = `https://testnet.explorer.etherlink.com/api/v2/addresses/0x272a166BE93DA4c2a91123AB7b3a504D637A363c/nft`;
+    const fetchURL = `https://testnet.explorer.etherlink.com/api/v2/addresses/${account}/nft`;
     
     fetch(fetchURL)
-      .then(res => res.json())
-      .then(data => {
-        setNfts(data.items || []);
-        setLoading(false);
+      .then(res => {
+        if (!res.ok) throw new Error('NFT fetch failed');
+        return res.json();
       })
-      .catch(() => setLoading(false));
+      .then(data => {
+        setNfts(data?.items || []);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, [account]);
 
   if (loading) return <div className="p-4 text-center">Loading NFTs...</div>;
@@ -42,29 +73,24 @@ const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
           key={`${nft.token_id}-${nft.contract_address}`}
           className="nft-card"
         >
-          {nft.metadata?.image && (
-            <div className="nft-media">
-              <Image
-                src={nft.metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/')}
-                alt={nft.metadata.name || `NFT ${nft.token_id}`}
-                fill
-                className="nft-image"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            </div>
-          )}
+          <div className="nft-media">
+            <NFTImage 
+              metadata={nft.metadata} 
+              tokenId={nft.token_id} 
+            />
+          </div>
+          
           <div className="nft-details">
             <h3 className="nft-title text-truncate">
               {nft.metadata?.name || `Token #${nft.token_id}`}
             </h3>
+            
             {nft.metadata?.description && (
               <p className="text-truncate">
                 {nft.metadata.description}
               </p>
             )}
+            
             <div className="nft-collection text-truncate">
               {nft.contract_address}
             </div>
@@ -76,9 +102,3 @@ const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
 };
 
 export default NFTGallery;
-
-
-
-
-//fetch(`https://testnet.explorer.etherlink.com/api/v2/addresses/${account}/nft`)
-//fetch(`https://testnet.explorer.etherlink.com/api/v2/addresses/0x272a166BE93DA4c2a91123AB7b3a504D637A363c/nft`)

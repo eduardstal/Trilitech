@@ -2,6 +2,7 @@
 import { useState } from "react";
 import WalletConnect from '../components/WalletConnect';
 import NFTGallery from '../components/NFTGallery';
+import MintNFT from '../components/Mint';
 import Image from "next/image";
 import Link from "next/link";
 
@@ -24,6 +25,7 @@ export default function Home() {
           </Link>
           <span className="site-title">EtherLink Demo</span>
         </div>
+          {account && <MintNFT account={account} />}
         <div className="header-right">
           <WalletConnect onConnect={setAccount} />
         </div>
