@@ -8,7 +8,7 @@ export default function HomePage() {
 
   return (
     <main>
-      <h1>technolojia</h1>
+      <h1>Trilitech Demo</h1>
       <WalletConnect onConnect={setAccount} />
       {account && <NFTGallery account={account} />}
     </main>
