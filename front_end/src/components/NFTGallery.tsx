@@ -1,10 +1,10 @@
 // src/components/NFTGallery.tsx
 import React, { useEffect, useState } from "react";
-import Image from 'next/image';
-import TransferNFT from '../components/Transfer';
+import Image from "next/image";
+import TransferNFT from "../components/Transfer";
 
 // Static assets
-const PLACEHOLDER_IMAGE = '/placeholder.png';
+const PLACEHOLDER_IMAGE = "/placeholder.png";
 
 interface NFTMetadata {
   image?: string;
@@ -23,8 +23,8 @@ const NFTImage: React.FC<{
   tokenId: string;
 }> = ({ metadata, tokenId }) => {
   const [imgSrc, setImgSrc] = useState(
-    metadata?.image 
-      ? metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+    metadata?.image
+      ? metadata.image.replace("ipfs://", "https://ipfs.io/ipfs/")
       : PLACEHOLDER_IMAGE
   );
 
@@ -44,60 +44,86 @@ const NFTImage: React.FC<{
 const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
 
-  useEffect(() => {
+  const refreshNFTs = () => {
     if (!account) return;
-    
     setLoading(true);
-    const fetchURL = `https://testnet.explorer.etherlink.com/api/v2/addresses/${account}/nft`;
-    
-    fetch(fetchURL)
-      .then(res => {
-        if (!res.ok) throw new Error('NFT fetch failed');
-        return res.json();
-      })
-      .then(data => {
-        setNfts(data?.items || []);
-      })
-      .catch(console.error)
+    fetch(
+      `https://testnet.explorer.etherlink.com/api/v2/addresses/${account}/nft`
+    )
+      .then((res) => res.json())
+      .then((data) => setNfts(data?.items || []))
       .finally(() => setLoading(false));
-  }, [account]);
+  };
 
-  if (loading) return <div className="p-4 text-center">Loading NFTs...</div>;
-  if (!nfts.length) return <div className="p-4 text-center">No NFTs found for this wallet.</div>;
+  useEffect(refreshNFTs, [account]);
+
+  // --- Loading and Empty States ---
+  if (loading)
+    return <div className="p-4 text-center">Loading NFTs...</div>;
+  if (!nfts.length)
+    return (
+      <div className="p-4 text-center">
+        No NFTs found for this wallet.
+      </div>
+    );
 
   return (
-    <div className="nft-grid">
-      {nfts.map(nft => (
-        <article 
-          key={`${nft.token_id}-${nft.contract_address}`}
-          className="nft-card"
-        >
-          <div className="nft-media">
-            <NFTImage 
-              metadata={nft.metadata} 
-              tokenId={nft.token_id} 
+    <>
+      <div className="nft-grid">
+        {nfts.map((nft) => (
+          <article
+            key={`${nft.token_id}-${nft.contract_address}`}
+            className="nft-card"
+            onClick={() => setSelectedTokenId(nft.token_id)}
+            tabIndex={0}
+            style={{ cursor: "pointer" }}
+            aria-label={`Transfer NFT ${nft.metadata?.name || nft.token_id}`}
+          >
+            <div className="nft-media">
+              <NFTImage metadata={nft.metadata} tokenId={nft.token_id} />
+            </div>
+
+            <div className="nft-details">
+              <h3 className="nft-title text-truncate">
+                {nft.metadata?.name || `Token #${nft.token_id}`}
+              </h3>
+
+              {nft.metadata?.description && (
+                <p className="text-truncate">
+                  {nft.metadata.description}
+                </p>
+              )}
+
+              <div className="nft-collection text-truncate">
+                {nft.contract_address}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {selectedTokenId && (
+        <div className="modal-overlay" onClick={() => setSelectedTokenId(null)}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Transfer NFT #{selectedTokenId}</h3>
+            <TransferNFT
+              account={account}
+              tokenId={selectedTokenId}
+              onTransferred={() => {
+                setSelectedTokenId(null);
+                refreshNFTs();
+              }}
+              onCancel={() => setSelectedTokenId(null)}
             />
           </div>
-          
-          <div className="nft-details">
-            <h3 className="nft-title text-truncate">
-              {nft.metadata?.name || `Token #${nft.token_id}`}
-            </h3>
-            
-            {nft.metadata?.description && (
-              <p className="text-truncate">
-                {nft.metadata.description}
-              </p>
-            )}
-            
-            <div className="nft-collection text-truncate">
-              {nft.contract_address}
-            </div>
-          </div>
-        </article>
-      ))}
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

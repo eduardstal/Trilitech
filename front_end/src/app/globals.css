@@ -347,6 +347,29 @@ body {
   background: var(--surface-3);
 }
 
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0 0 0 / 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: var(--surface-2);
+  padding: 2rem;
+  border-radius: var(--radius);
+  width: min(90vw, 500px);
+  box-shadow: 0 8px 32px rgba(0 0 0 / 0.1);
+}
+
+.modal-content h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
 /* Responsive: stack on mobile if needed */
 @media (max-width: 600px) {
   .site-header {
