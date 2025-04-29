@@ -1,3 +1,5 @@
+Use react 18
+
 install prerequisites
 
 install npm
