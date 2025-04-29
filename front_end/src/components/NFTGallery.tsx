@@ -1,4 +1,3 @@
-// src/components/NFTGallery.tsx
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import TransferNFT from "../components/Transfer";
@@ -6,15 +5,19 @@ import TransferNFT from "../components/Transfer";
 const PLACEHOLDER_IMAGE = "/placeholder.png";
 
 interface NFTMetadata {
+  description?: string;
   image?: string;
   name?: string;
-  description?: string;
 }
 
 interface NFT {
-  token_id: string;
+  id: string;
   contract_address: string;
   metadata?: NFTMetadata;
+  token: {
+    address: string;
+    name: string;
+  };
 }
 
 const NFTImage: React.FC<{
@@ -45,7 +48,6 @@ const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
   const [loading, setLoading] = useState(false);
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
 
-  // Fetch NFTs for the connected account
   const refreshNFTs = () => {
     if (!account) return;
     setLoading(true);
@@ -55,58 +57,34 @@ const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
       .then((res) => res.json())
       .then((data) => {
         setNfts(data?.items || []);
-        // Debug: log the items
-        console.log("Fetched NFTs:", data?.items);
       })
       .finally(() => setLoading(false));
   };
 
   useEffect(refreshNFTs, [account]);
 
-  // Debug: log selected token
-  useEffect(() => {
-    if (selectedTokenId) {
-      console.log("Selected Token ID for transfer:", selectedTokenId);
-    }
-  }, [selectedTokenId]);
-
-  if (loading)
-    return <div className="p-4 text-center">Loading NFTs...</div>;
+  if (loading) return <div className="p-4 text-center">Loading NFTs...</div>;
   if (!nfts.length)
-    return (
-      <div className="p-4 text-center">
-        No NFTs found for this wallet.
-      </div>
-    );
+    return <div className="p-4 text-center">No NFTs found for this wallet.</div>;
 
   return (
     <>
       <div className="nft-grid">
-        {nfts.map((nft, index) => {
-          // Use all available info for the key, fallback to index if needed
-          const uniqueKey = `${nft.token_id ?? index}-${nft.contract_address ?? "no-contract"}`;
+        {nfts.map((nft) => {
+          const uniqueKey = `${nft.id}-${nft.token.address}`;
           return (
             <article
               key={uniqueKey}
               className="nft-card"
-              onClick={() => {
-                if (nft.token_id) {
-                  setSelectedTokenId(nft.token_id);
-                } else {
-                  console.warn("NFT has no token_id!", nft);
-                }
-              }}
-              role="button"
-              tabIndex={0}
+              onClick={() => setSelectedTokenId(nft.id)}
               style={{ cursor: "pointer" }}
-              aria-label={`Transfer NFT ${nft.metadata?.name || nft.token_id || index}`}
             >
               <div className="nft-media">
-                <NFTImage metadata={nft.metadata} tokenId={nft.token_id} />
+                <NFTImage metadata={nft.metadata} tokenId={nft.id} />
               </div>
               <div className="nft-details">
                 <h3 className="nft-title text-truncate">
-                  {nft.metadata?.name || `Token #${nft.token_id}`}
+                  {nft.metadata?.name || `Token #${nft.id}`}
                 </h3>
                 {nft.metadata?.description && (
                   <p className="text-truncate">
@@ -114,7 +92,7 @@ const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
                   </p>
                 )}
                 <div className="nft-collection text-truncate">
-                  {nft.contract_address}
+                  {nft.token.name}
                 </div>
               </div>
             </article>
@@ -123,11 +101,7 @@ const NFTGallery: React.FC<{ account: string }> = ({ account }) => {
       </div>
 
       {selectedTokenId && (
-        <div
-          className="modal-overlay"
-          onClick={() => setSelectedTokenId(null)}
-          style={{ display: "grid" }}
-        >
+        <div className="modal-overlay" onClick={() => setSelectedTokenId(null)}>
           <div
             className="modal-content"
             onClick={(e) => e.stopPropagation()}
