@@ -182,9 +182,14 @@ const WalletConnect: React.FC<WalletConnectProps> = ({ onConnect, onChainChanged
 
   if (!isMetamaskInstalled) {
     return (
-      <div>
+      <div className="wallet-container">
         <p>Please install MetaMask to connect your wallet.</p>
-        <a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">
+        <a 
+          className="connect-button" 
+          href="https://metamask.io/download/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
           Install MetaMask
         </a>
       </div>
@@ -193,18 +198,27 @@ const WalletConnect: React.FC<WalletConnectProps> = ({ onConnect, onChainChanged
 
   if (account) {
     return (
-      <div>
-        <div>
-          <span>Connected: {account.slice(0, 6)}...{account.slice(-4)}</span>
-          {chainId && <span> on Chain ID: {parseInt(chainId, 16)}</span>}
+      <div className="connected-display">
+        <div className="address-chip text-truncate">
+          {account.slice(0, 6)}...{account.slice(-4)}
+          {chainId && ` (Chain ${parseInt(chainId, 16)})`}
         </div>
-        <button onClick={disconnect}>Disconnect</button>
+        <button 
+          className="connect-button" 
+          onClick={disconnect}
+        >
+          Disconnect
+        </button>
       </div>
     );
   }
 
   return (
-    <button onClick={connect} disabled={connecting}>
+    <button 
+      className="connect-button" 
+      onClick={connect} 
+      disabled={connecting}
+    >
       {connecting ? "Connecting..." : "Connect Wallet"}
     </button>
   );

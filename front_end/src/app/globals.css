@@ -174,3 +174,35 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.site-header {
+  width: 100%;
+  padding: 1.5rem 0 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface-1, #fff);
+}
+
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.site-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;     /* Makes the image perfectly circular */
+  object-fit: cover;      /* Ensures the image fills the circle */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: white;
+  transition: box-shadow 0.15s;
+  display: block;
+}
+
+.logo-link:hover .site-logo {
+  box-shadow: 0 4px 16px rgba(59,130,246,0.14);
+}
