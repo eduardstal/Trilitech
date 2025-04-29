@@ -9,5 +9,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     },
   };
 
-  return <MetaMaskProvider sdkOptions={sdkOptions}>{children}</MetaMaskProvider>;
+  return (
+    <MetaMaskProvider sdkOptions={sdkOptions}>
+      {children}
+    </MetaMaskProvider>
+  );
 }
