@@ -12,6 +12,17 @@ const nextConfig = {
         hostname: 'upload.wikimedia.org',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ipfs.raribleuserdata.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets.raribleuserdata.com',
+        pathname: '/**',
+      },
+
       // Optionally, add more gateways if needed:
       // {
       //   protocol: 'https',

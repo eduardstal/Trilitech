@@ -117,7 +117,7 @@ etherlink: {
 If from the verbose output you see that the point at which the deployment is stuck is `hardhat:core:hre Creating provider for network etherlink +26ms` then make sure that enough funds are in the wallet to cover the gas fees.
 You can request testnet tokens from the faucet at https://faucet.etherlink.com.
 ###### Deploying the contract fails due to the gas limit being exceeded. 
-Set the gas limit to 30_000_000 or lower in the hardhat.config.ts file. 
+Set the gas price to 2_000_000_000 and the gas limit to 30_000_000 or lower in the hardhat.config.ts file. 
 ```ts
 etherlink: {
     gas: 30_000_000,
@@ -167,5 +167,7 @@ const nextConfig = {
   },
 };
 ```
+###### When transferring an NFT, the following error is displayed: "Please enter a valid EVM address." 
+This happens due to a failed validation of the address. Either the checksum address is invalid, or the address is not a valid EVM address at all. To be safe, you can use the lowercase address format to avoid checksum issues.
 
 
