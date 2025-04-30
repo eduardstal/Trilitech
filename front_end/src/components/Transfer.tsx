@@ -29,7 +29,7 @@ const TransferNFT: React.FC<TransferNFTProps> = ({
     }
     
     if (!ethers.isAddress(recipient)) {
-      setMessage("Please enter a valid Ethereum address.");
+      setMessage("Please enter a valid EVM address.");
       return;
     }
 
