@@ -1,3 +1,25 @@
+### Setup instructions for contracts
+## Install prerequisites
+
+-- 
+### Setup instructions for frontend
+## Install prerequisites
+## actual setup
+## potential issues during setup
+## customisation for etherlink
+
+## How to mint and transfer NFTs' 
+
+## Notes about EtherLink
+
+
+## Potential improvements
+
+🧪 Testnet Resources
+🔗 Etherlink Testnet Faucet
+🌐 RPC: https://node.ghostnet.etherlink.com 
+🧾 Explorer: https://testnet.explorer.etherlink.com/ 
+
 Use react 18
 
 install prerequisites
